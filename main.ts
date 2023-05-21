@@ -5,11 +5,12 @@ let mainWindow: BrowserWindow | null = null;
 
 app.on('ready', () => {
   mainWindow = new BrowserWindow();
+  mainWindow.webContents.openDevTools();
 
   // Check for updates
   autoUpdater.checkForUpdatesAndNotify();
 
-  mainWindow.loadFile('index.html');
+  mainWindow.loadFile('./dist/index.html');
 });
 
 // Listen for update events
