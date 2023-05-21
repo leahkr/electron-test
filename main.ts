@@ -15,10 +15,12 @@ app.on('ready', () => {
 
 // Listen for update events
 autoUpdater.on('update-available', () => {
+  console.log("update available")
   mainWindow?.webContents.send('update_available');
 });
 
 autoUpdater.on('update-downloaded', () => {
+  console.log("update available")
   mainWindow?.webContents.send('update_downloaded');
 });
 
@@ -37,6 +39,7 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     mainWindow = new BrowserWindow();
-    mainWindow.loadFile('index.html');
+    mainWindow.webContents.openDevTools();
+    mainWindow.loadFile('./dist/index.html');
   }
 });
