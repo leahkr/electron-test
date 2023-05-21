@@ -2,7 +2,8 @@ import { app, BrowserWindow, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 
-
+// Check for update after x seconds
+const checkForUpdatesInterval = 60000; // in milliseconds
 
 log.info('App starting...');
 log.transports.file.level = "info"
@@ -14,8 +15,12 @@ app.on('ready', () => {
   mainWindow.webContents.openDevTools();
 
   // Check for updates
-  autoUpdater.checkForUpdatesAndNotify();
-  mainWindow.loadFile('./dist/index.html');
+  setInterval(() => {
+    autoUpdater.checkForUpdatesAndNotify();
+  }, checkForUpdatesInterval);
+    
+   log.info(autoUpdater.getFeedURL());
+   mainWindow.loadFile('./dist/index.html');
 });
 
 // Listen for update events
@@ -51,3 +56,13 @@ app.on('activate', () => {
     mainWindow.loadFile('./dist/index.html');
   }
 });
+
+autoUpdater.on('error', (error) => {
+  log.error('Update error: ' + error == null ? "unknown" : (error.stack || error).toString());
+});
+
+autoUpdater.on('checking-for-update', () => {
+  log.info('Checking for update...');
+});
+
+

@@ -1,6 +1,6 @@
 {
   "name": "electron-test",
-  "version": "0.0.4",
+  "version": "0.0.3",
   "author": {
     "name": "LK"
   },
@@ -9,7 +9,7 @@
   "scripts": {
     "start": "npm run electron:build && electron .",
     "tsc": "tsc",
-    "build": "npm run clean && npm run electron:build && electron-builder -p always",
+    "build": "npm run clean && npm run electron:build && electron-builder  ",
     "electron:build": "copyfiles ./index.html dist && tsc -p ./tsconfig-build.json ",
     "clean": "rimraf dist"
   },
