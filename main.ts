@@ -1,23 +1,41 @@
-const { app, BrowserWindow } = require('electron');
+import { app, BrowserWindow, ipcMain } from 'electron';
+import { autoUpdater } from 'electron-updater';
 
-function createWindow () {
-  const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-    webPreferences: {
-      nodeIntegration: true,
-    }
-  });
+let mainWindow: BrowserWindow | null = null;
+
+app.on('ready', () => {
+  mainWindow = new BrowserWindow();
+
+  // Check for updates
+  autoUpdater.checkForUpdatesAndNotify();
 
   mainWindow.loadFile('index.html');
-}
-
-app.whenReady().then(createWindow);
-
-app.on('window-all-closed', function () {
-   app.quit();
 });
 
-app.on('activate', function () {
-  if (BrowserWindow.getAllWindows().length === 0) createWindow();
+// Listen for update events
+autoUpdater.on('update-available', () => {
+  mainWindow?.webContents.send('update_available');
+});
+
+autoUpdater.on('update-downloaded', () => {
+  mainWindow?.webContents.send('update_downloaded');
+});
+
+// When receiving a quitAndInstall signal, we call autoUpdater.quitAndInstall() to
+// close the application and install the update
+ipcMain.on('quitAndInstall', () => {
+  autoUpdater.quitAndInstall();
+});
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+});
+
+app.on('activate', () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    mainWindow = new BrowserWindow();
+    mainWindow.loadFile('index.html');
+  }
 });
