@@ -1,6 +1,6 @@
 {
   "name": "electron-test",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": {"name": "LK"},
   "description": "test update",
   "main": "./dist/main.js",
