@@ -1,45 +1,42 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
-import { autoUpdater } from 'electron-updater';
+import { autoUpdater, UpdateCheckResult } from 'electron-updater';
 import log from 'electron-log';
+import * as semver from "semver";
 
 // Check for update after x seconds
 const checkForUpdatesInterval = 60000; // in milliseconds
 
 log.info('App starting...');
 log.transports.file.level = "info"
-
+let currentVersion: string;
+let updateInfo: UpdateCheckResult;
 let mainWindow: BrowserWindow | null = null;
 
 app.on('ready', () => {
   mainWindow = new BrowserWindow();
   mainWindow.webContents.openDevTools();
+  autoUpdater.autoDownload = true;
+  autoUpdater.autoInstallOnAppQuit = true;
+  autoUpdater.checkForUpdates();
 
-  // Check for updates
-  setInterval(() => {
-    autoUpdater.checkForUpdatesAndNotify();
-  }, checkForUpdatesInterval);
-    
-   log.info(autoUpdater.getFeedURL());
-   mainWindow.loadFile('./dist/index.html');
+  mainWindow.loadFile('./dist/index.html');
+});
+autoUpdater.on("update-downloaded", info => {
+  log.info("Installing update...", info);
+  autoUpdater.quitAndInstall(false, true);
 });
 
+ipcMain.handle("install-update", async (_, __) => {
+  log.info("Downloading update...");
+  await autoUpdater.downloadUpdate();
+  log.info("Finished downloading update...");
+});
 // Listen for update events
 autoUpdater.on('update-available', () => {
   log.info('Update available.');
-  mainWindow?.webContents.send('update_available');
+  mainWindow.webContents.send('update_available');
 });
 
-autoUpdater.on('update-downloaded', () => {
-  log.info('Update downloaded.');
-  mainWindow?.webContents.send('update_downloaded');
-});
-
-// When receiving a quitAndInstall signal, we call autoUpdater.quitAndInstall() to
-// close the application and install the update
-ipcMain.on('quitAndInstall', () => {
-  log.info('Received quitAndInstall signal.');
-  autoUpdater.quitAndInstall();
-});
 
 app.on('window-all-closed', () => {
   log.info('All windows closed.');
@@ -64,5 +61,6 @@ autoUpdater.on('error', (error) => {
 autoUpdater.on('checking-for-update', () => {
   log.info('Checking for update...');
 });
+
 
 

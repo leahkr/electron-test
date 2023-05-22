@@ -1,6 +1,6 @@
 {
   "name": "electron-test",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "author": {
     "name": "LK"
   },
@@ -32,6 +32,12 @@
           ]
         }
       ]
+    },
+    "nsis": {
+      "oneClick": true,
+      "deleteAppDataOnUninstall": true,
+      "createDesktopShortcut": true,
+      "perMachine": true
     },
     "publish": [
       {
